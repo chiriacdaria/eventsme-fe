@@ -8,15 +8,21 @@ import { StorageKey } from '../types/store.type';
 import Avatar, { genConfig } from 'react-nice-avatar';
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
-import { Button, Tooltip } from '@mantine/core';
+import { Button, Modal, Tooltip } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
+import { updateUser } from '../api/user';
+import { useDisclosure } from '@mantine/hooks';
+import { format } from 'date-fns';
 
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
+  const [opened, { open, close }] = useDisclosure(false);
+
   const [userData, setUserData] = useState({
     fullName: '',
     email: '',
     phoneNumber: '',
-    profilePicture: '',
   });
   const [isEditingDetails, setIsEditingDetails] = useState(false);
   const [change, setChange] = useState('');
@@ -55,8 +61,11 @@ const ProfilePage = () => {
     }));
   };
 
+
   const saveEditedDetails = async () => {
     try {
+      await updateUser(userData, { fieldsToUpdate: editedUserData });
+
       setUserData((prevUserData) => ({
         ...prevUserData,
         ...editedUserData,
@@ -71,7 +80,30 @@ const ProfilePage = () => {
   };
 
   const config = genConfig(change);
-
+  
+  const handleDeleteAccount = async () => {
+    //TODO: this is wyp
+    try {
+      const deletedAt = format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+  console.log(deletedAt)
+      const updatedUserData = { ...editedUserData, deletedAt };
+  
+      await updateUser(userData, { fieldsToUpdate: updatedUserData });
+       
+      setUserData(updatedUserData);
+  
+      close();
+  
+      // Optionally, navigate to a different page after account deletion
+      // navigate('/goodbye');
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+    }
+  };
+  
+  
+  
+  
 
   return (
     <>
@@ -184,7 +216,7 @@ const ProfilePage = () => {
 </div>
 <div className="mt-4 ">
     <Button
-      //onClick={deleteAccount}
+      onClick={() => navigate('/eventsme/events')}
       variant="filled"
       color="#1F2937"
       radius="md"
@@ -195,7 +227,7 @@ See my events
   </div>
 <div className="mt-4 ">
     <Button
-      //onClick={deleteAccount}
+onClick={open}
       variant="filled"
       color="red"
       radius="md"
@@ -204,6 +236,18 @@ See my events
       Delete Account
     </Button>
   </div>
+  <Modal opened={opened} onClose={close} centered >
+  <div className="p-4">
+    <h2 className="mb-4 text-xl font-semibold">Delete Account</h2>
+    <p className="mb-4 text-sm text-gray-700">Are you sure you want to delete your account?</p>
+    <div className="flex justify-end">
+      <Button onClick={close}        color="#1F2937"
+className="mr-2">Cancel</Button>
+      <Button color="red" onClick={handleDeleteAccount}>Delete</Button>
+    </div>
+  </div>
+</Modal>
+
           </div>
         </div>
       </div>

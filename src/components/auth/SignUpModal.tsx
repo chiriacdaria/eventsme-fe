@@ -6,7 +6,8 @@ import {
 import { useState } from "react";
 import { register } from "../../api/auth";
 import { notifications } from '@mantine/notifications';
-
+import { StorageKey } from "../../types/store.type";
+import { useNavigate } from "react-router-dom";
 interface SignUpModalProps {
   onClose: () => void;
   onLogInClick: () => void;
@@ -55,7 +56,7 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ onClose, onLogInClick }) => {
     setPassword(value);
     setPasswordError(validatePassword(value));
   };
-
+const navigate =useNavigate();
   const handleRepeatPasswordChange = (value: string) => {
     setRepeatPassword(value);
     setRepeatPasswordError(value === password ? "" : "Passwords do not match");
@@ -78,12 +79,17 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ onClose, onLogInClick }) => {
     event.preventDefault();
  
 
-    if (passwordError || repeatPasswordError || emailError) {
+    if (passwordError || repeatPasswordError || emailError || !email || !password || !repeatPassword) {
       return;
     }
+  
 
     try {
-      await register(email, password);
+     const {accessToken, user} =  await register(email, password);
+     localStorage.setItem(StorageKey.EventsMe, accessToken)
+     localStorage.setItem(StorageKey.User, JSON.stringify(user))
+     
+     navigate('/eventsme/profile')
       onClose();
     } catch (error) {
       notifications.show({
@@ -174,6 +180,8 @@ const SignUpModal: React.FC<SignUpModalProps> = ({ onClose, onLogInClick }) => {
               onMouseOver={() => setHovered(true)}
               onMouseOut={() => setHovered(false)}
               onClick={handleSignUp}
+              disabled={!!(passwordError || repeatPasswordError || emailError || !email || !password || !repeatPassword)}
+
             >
               Sign In
             </button>

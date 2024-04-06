@@ -33,8 +33,7 @@ const Header: React.FC = () => {
     } else {
       setIsLoggedIn(false);
     }
-  }, [localStorage.getItem(StorageKey.EventsMe)
-]);
+  }, [localStorage.getItem(StorageKey.EventsMe)]);
 
   const handleMyAccountClick = () => {
     navigate("/eventsme/profile");
