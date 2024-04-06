@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import * as React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import TodoPage from "./components/TodoPage";
+import Attended from "./components/main-page/Attented";
+import Overdue from "./components/main-page/Overdue";
+import Today from "./components/main-page/Today";
+import Calendar from "./components/main-page/Calendar";
+import Events from "./components/main-page/events/Events";
+import Event from "./components/main-page/events/Event";
+import CreateEvent from "./components/main-page/events/CreateEvent";
+import ProfilePage from "./components/ProfilePage";
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="eventsme/*" element={<TodoPage />}>
+          <Route index element={<Events />} />
+          <Route path="" element={<Events />} />
+          <Route path="create" element={<CreateEvent />} />
+          <Route path=":eventId" element={<Event />} />
+          <Route path="attended" element={<Attended />} />
+          <Route path="overdue" element={<Overdue />} />
+          <Route path="today" element={<Today />} />
+          <Route path="calendar" element={<Calendar />} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
